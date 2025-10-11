@@ -1,59 +1,68 @@
 {
-  "name": "@fhevm-sdk",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
+  "name": "@fhevm/sdk",
+  "version": "1.0.0",
+  "description": "Universal FHEVM SDK for building confidential dApps with framework-agnostic encryption utilities",
   "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "src/index.ts",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "default": "./dist/index.js"
-    },
-    "./core": {
-      "types": "./src/core/index.ts",
-      "default": "./dist/core/index.js"
-    },
-    "./storage": {
-      "types": "./src/storage/index.ts",
-      "default": "./dist/storage/index.js"
-    },
-    "./types": {
-      "types": "./src/fhevmTypes.ts",
-      "default": "./dist/fhevmTypes.js"
+      "require": "./dist/index.js",
+      "import": "./dist/index.esm.js",
+      "types": "./dist/index.d.ts"
     },
     "./react": {
-      "types": "./src/react/index.ts",
-      "default": "./dist/react/index.js"
+      "require": "./dist/react.js",
+      "import": "./dist/react.esm.js",
+      "types": "./dist/react.d.ts"
     }
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "watch": "tsc -p tsconfig.json --watch",
-    "clean": "rm -rf dist",
-    "test": "vitest run --coverage",
-    "test:watch": "vitest"
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "jest",
+    "lint": "eslint src --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "fhevm",
+    "fhe",
+    "encryption",
+    "blockchain",
+    "ethereum",
+    "zama",
+    "confidential",
+    "privacy",
+    "sdk",
+    "wagmi-like"
+  ],
+  "author": "FHEVM SDK Contributors",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
   },
   "dependencies": {
-    "idb": "^8.0.3"
-  },
-  "peerDependencies": {
-    "@fhevm/mock-utils": "^0.1.0",
-    "@zama-fhe/relayer-sdk": "^0.2.0",
-    "ethers": "^6.13.4",
-    "react": "^18.0.0 || ^19.0.0"
+    "fhevmjs": "^0.5.0",
+    "ethers": "^6.9.0"
   },
   "devDependencies": {
-    "@types/node": "~18.19.50",
-    "@types/react": "~19.0.7",
-    "@vitest/coverage-v8": "2.1.9",
-    "@zama-fhe/relayer-sdk": "0.2.0",
-    "ethers": "^6.13.7",
-    "fake-indexeddb": "~6.0.0",
-    "jsdom": "^27.0.0",
-    "react": "~19.0.0",
-    "typescript": "~5.8.2",
-    "vitest": "~2.1.8"
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.0",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "eslint": "^8.55.0",
+    "jest": "^29.7.0",
+    "rollup": "^4.9.0",
+    "typescript": "^5.3.3"
   }
 }
