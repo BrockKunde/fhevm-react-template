@@ -1,0 +1,19 @@
+{
+  "name": "vanilla-js-fhevm-example",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vanilla JavaScript example using FHEVM SDK",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fhevm/sdk": "workspace:*",
+    "ethers": "^6.9.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

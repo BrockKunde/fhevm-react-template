@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FHEVM SDK - Vanilla JavaScript Example</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+      color: #333;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+
+    .section {
+      padding: 2rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .section:last-child {
+      border-bottom: none;
+    }
+
+    .section h2 {
+      color: #667eea;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+
+    .status {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .status.pending {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .input-group {
+      margin-bottom: 1rem;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #555;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .result-box {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      word-break: break-all;
+    }
+
+    .info-box {
+      background: #e7f3ff;
+      border-left: 4px solid #2196F3;
+      padding: 1rem;
+      margin-top: 1rem;
+      border-radius: 4px;
+    }
+
+    .info-box strong {
+      color: #1976D2;
+    }
+
+    code {
+      background: #f4f4f4;
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      color: #e83e8c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>FHEVM SDK</h1>
+      <p>Vanilla JavaScript Example</p>
+    </div>
+
+    <!-- Wallet Connection -->
+    <div class="section">
+      <h2>1. Connect Wallet</h2>
+      <button id="connectBtn">Connect MetaMask</button>
+      <div id="walletStatus"></div>
+    </div>
+
+    <!-- FHEVM Initialization -->
+    <div class="section">
+      <h2>2. FHEVM Initialization</h2>
+      <div id="fhevmStatus"></div>
+      <div class="info-box">
+        <strong>Note:</strong> FHEVM automatically initializes when you connect your wallet.
+        This may take a few seconds as it downloads the necessary encryption keys.
+      </div>
+    </div>
+
+    <!-- Encryption Example -->
+    <div class="section">
+      <h2>3. Encrypt Input</h2>
+      <div class="input-group">
+        <label for="valueInput">Value to Encrypt:</label>
+        <input type="number" id="valueInput" placeholder="Enter a number (e.g., 100)" value="100">
+      </div>
+      <div class="input-group">
+        <label for="typeSelect">Data Type:</label>
+        <select id="typeSelect" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 6px; font-size: 1rem;">
+          <option value="euint8">euint8 (0-255)</option>
+          <option value="euint16">euint16 (0-65535)</option>
+          <option value="euint32" selected>euint32 (0-4294967295)</option>
+          <option value="euint64">euint64 (large numbers)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="contractAddress">Contract Address:</label>
+        <input type="text" id="contractAddress" placeholder="0x..." value="0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb">
+      </div>
+      <button id="encryptBtn">Encrypt Value</button>
+      <div id="encryptResult"></div>
+    </div>
+
+    <!-- Decryption Example -->
+    <div class="section">
+      <h2>4. Decrypt Output</h2>
+      <div class="input-group">
+        <label for="handleInput">Encrypted Handle:</label>
+        <input type="text" id="handleInput" placeholder="Enter encrypted handle from contract">
+      </div>
+      <button id="decryptBtn">Decrypt Value</button>
+      <div id="decryptResult"></div>
+      <div class="info-box">
+        <strong>Note:</strong> Decryption requires a valid encrypted handle from the contract
+        and proper permissions via EIP-712 signature.
+      </div>
+    </div>
+
+    <!-- Code Example -->
+    <div class="section">
+      <h2>5. Code Example</h2>
+      <p style="margin-bottom: 1rem;">This example demonstrates the FHEVM SDK usage in vanilla JavaScript:</p>
+      <div class="result-box">
+<pre>import { createFhevmClient, initFhevm, encryptInput } from '@fhevm/sdk';
+import { ethers } from 'ethers';
+
+// 1. Create client
+const provider = new ethers.BrowserProvider(window.ethereum);
+const signer = await provider.getSigner();
+const client = createFhevmClient({ provider, signer });
+
+// 2. Initialize FHEVM
+await initFhevm(client);
+
+// 3. Encrypt input
+const encrypted = await encryptInput({
+  values: [{ value: 100, type: 'euint32' }],
+  contractAddress: '0x...',
+  userAddress: await signer.getAddress(),
+});
+
+// 4. Use in contract call
+await contract.myFunction(
+  encrypted.handles[0],
+  encrypted.inputProof
+);</pre>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>
