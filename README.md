@@ -358,7 +358,7 @@ Watch our video demonstration to see the SDK in action:
 
 **📥 Download Required**: The demo video must be downloaded to view.
 
-[Download demo.mp4](./demo.mp4)
+[Download demo.mp4]
 
 The demo covers:
 1. Wallet connection and setup
