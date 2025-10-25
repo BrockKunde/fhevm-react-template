@@ -4,11 +4,6 @@ pragma solidity ^0.8.24;
 import { FHE, euint8, euint32, euint64, ebool } from "@fhevm/solidity/lib/FHE.sol";
 import { SepoliaConfig } from "@fhevm/solidity/config/ZamaConfig.sol";
 
-/**
- * @title ConfidentialSportsBetting
- * @notice A fully confidential sports betting platform using FHEVM
- * @dev Implements encrypted bet predictions with private outcomes until match completion
- */
 contract ConfidentialSportsBetting is SepoliaConfig {
 
     address public owner;
@@ -155,7 +150,7 @@ contract ConfidentialSportsBetting is SepoliaConfig {
         uint8 betOptions // bit 0: isOver, bit 1-2: predictedWinner
     ) external payable matchExists(matchId) matchActive(matchId) {
         require(msg.value >= MIN_BET_AMOUNT && msg.value <= MAX_BET_AMOUNT, "Invalid bet amount");
-        require((bets[matchId][msg.sender].flags & 16) == 0, "Already placed bet for this match");
+        require((bets[matchId][msg.sender].flags & 16) == 0, "Already placed bet for this match"); // check exists bit
 
         if (betType == BetType.WinLose) {
             require(prediction <= 1, "Invalid win/lose prediction");
@@ -223,8 +218,8 @@ contract ConfidentialSportsBetting is SepoliaConfig {
         matchFinished(matchId)
     {
         Bet storage userBet = bets[matchId][msg.sender];
-        require((userBet.flags & 16) != 0, "No bet found");
-        require((userBet.flags & 1) == 0, "Already claimed");
+        require((userBet.flags & 16) != 0, "No bet found"); // check exists bit
+        require((userBet.flags & 1) == 0, "Already claimed"); // check claimed bit
 
         Match memory matchData = matches[matchId];
         MatchBetting memory betting = matchBetting[matchId];
@@ -305,8 +300,8 @@ contract ConfidentialSportsBetting is SepoliaConfig {
         for (uint i = 0; i < bettors.length; i++) {
             address bettor = bettors[i];
             Bet storage userBet = bets[matchId][bettor];
-            if ((userBet.flags & 16) != 0 && (userBet.flags & 1) == 0) {
-                userBet.flags |= 1;
+            if ((userBet.flags & 16) != 0 && (userBet.flags & 1) == 0) { // exists and not claimed
+                userBet.flags |= 1; // set claimed bit
                 payable(bettor).transfer(userBet.amount);
             }
         }
@@ -367,8 +362,8 @@ contract ConfidentialSportsBetting is SepoliaConfig {
         return (
             userBet.amount,
             userBet.betType,
-            (userBet.flags & 1) != 0,
-            (userBet.flags & 16) != 0
+            (userBet.flags & 1) != 0, // claimed bit
+            (userBet.flags & 16) != 0 // exists bit
         );
     }
 
@@ -379,8 +374,8 @@ contract ConfidentialSportsBetting is SepoliaConfig {
     ) {
         Bet memory userBet = bets[matchId][bettor];
         return (
-            TeamSide((userBet.flags >> 1) & 3),
-            (userBet.flags & 2) != 0,
+            TeamSide((userBet.flags >> 1) & 3), // predictedWinner from bits 1-2
+            (userBet.flags & 2) != 0, // isOver from bit 1
             userBet.timestamp
         );
     }

@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confidential Sports Betting Platform</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ffd700, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .wallet-info {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .connect-wallet {
+            background: linear-gradient(45deg, #ff6b35, #ffd700);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 15px;
+        }
+
+        .connect-wallet:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-button {
+            flex: 1;
+            background: transparent;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(45deg, #ff6b35, #ffd700);
+            color: white;
+        }
+
+        .tab-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .match-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .match-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .teams {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .match-time {
+            background: rgba(255, 107, 53, 0.2);
+            color: #ff6b35;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .betting-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .bet-type {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bet-type h4 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .bet-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .bet-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .bet-button:hover, .bet-button.selected {
+            background: linear-gradient(45deg, #ff6b35, #ffd700);
+            border-color: #ffd700;
+        }
+
+        .bet-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .bet-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            width: 100px;
+        }
+
+        .bet-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .place-bet {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .place-bet:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(40, 167, 69, 0.4);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .rewards-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .reward-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reward-info {
+            flex-grow: 1;
+        }
+
+        .reward-amount {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .claim-reward {
+            background: linear-gradient(45deg, #ffd700, #ff6b35);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-active { background: #28a745; }
+        .status-finished { background: #ffc107; }
+        .status-cancelled { background: #dc3545; }
+
+        .hidden {
+            display: none;
+        }
+
+        .contract-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .contract-info h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .contract-address {
+            font-family: monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .betting-options {
+                grid-template-columns: 1fr;
+            }
+
+            .match-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .bet-input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .bet-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-lock"></i> Confidential Sports Betting</h1>
+            <p>Privacy-First Sports Betting Platform with Fully Homomorphic Encryption</p>
+        </div>
+
+        <div class="contract-info">
+            <h3><i class="fas fa-code"></i> Smart Contract Information</h3>
+            <p><strong>Betting Contract:</strong></p>
+            <div class="contract-address" id="bettingContractAddress">Deploy contract to see address</div>
+            <p><strong>Rewards Contract:</strong></p>
+            <div class="contract-address" id="rewardsContractAddress">Deploy contract to see address</div>
+            <p><strong>Network:</strong> Zama Sepolia Testnet</p>
+        </div>
+
+        <div class="wallet-info">
+            <button class="connect-wallet" onclick="connectWallet()">
+                <i class="fas fa-wallet"></i> Connect Wallet
+            </button>
+            <span id="walletAddress">Not Connected</span>
+            <span id="balance" style="margin-left: 20px;">Balance: 0 ETH</span>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('matches')">
+                <i class="fas fa-calendar-alt"></i> Active Matches
+            </button>
+            <button class="tab-button" onclick="showTab('mybets')">
+                <i class="fas fa-ticket-alt"></i> My Bets
+            </button>
+            <button class="tab-button" onclick="showTab('rewards')">
+                <i class="fas fa-trophy"></i> Rewards
+            </button>
+            <button class="tab-button" onclick="showTab('history')">
+                <i class="fas fa-history"></i> History
+            </button>
+        </div>
+
+        <div id="matches" class="tab-content">
+            <div id="matchesList">
+                <div class="match-card">
+                    <div class="match-header">
+                        <div class="teams">
+                            <span class="status-indicator status-active"></span>
+                            Manchester United vs Liverpool
+                        </div>
+                        <div class="match-time">
+                            <i class="fas fa-clock"></i> 2024-12-25 15:00 UTC
+                        </div>
+                    </div>
+
+                    <div class="betting-options">
+                        <div class="bet-type">
+                            <h4><i class="fas fa-trophy"></i> Match Winner</h4>
+                            <div class="bet-options">
+                                <button class="bet-button" onclick="selectBet(this, 'win', 'home')">
+                                    Man United (2.1x)
+                                </button>
+                                <button class="bet-button" onclick="selectBet(this, 'win', 'draw')">
+                                    Draw (3.2x)
+                                </button>
+                                <button class="bet-button" onclick="selectBet(this, 'win', 'away')">
+                                    Liverpool (1.8x)
+                                </button>
+                            </div>
+                            <div class="bet-input-group">
+                                <input type="number" class="bet-input" placeholder="Amount" step="0.01" min="0.01">
+                                <button class="place-bet" onclick="placeBet(1, 'win')">Place Bet</button>
+                            </div>
+                        </div>
+
+                        <div class="bet-type">
+                            <h4><i class="fas fa-futbol"></i> Total Goals</h4>
+                            <div class="bet-options">
+                                <button class="bet-button" onclick="selectBet(this, 'total', 'over')">
+                                    Over 2.5 (1.9x)
+                                </button>
+                                <button class="bet-button" onclick="selectBet(this, 'total', 'under')">
+                                    Under 2.5 (1.9x)
+                                </button>
+                            </div>
+                            <div class="bet-input-group">
+                                <input type="number" class="bet-input" placeholder="Amount" step="0.01" min="0.01">
+                                <button class="place-bet" onclick="placeBet(1, 'total')">Place Bet</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="match-card">
+                    <div class="match-header">
+                        <div class="teams">
+                            <span class="status-indicator status-active"></span>
+                            Barcelona vs Real Madrid
+                        </div>
+                        <div class="match-time">
+                            <i class="fas fa-clock"></i> 2024-12-26 20:00 UTC
+                        </div>
+                    </div>
+
+                    <div class="betting-options">
+                        <div class="bet-type">
+                            <h4><i class="fas fa-trophy"></i> Match Winner</h4>
+                            <div class="bet-options">
+                                <button class="bet-button" onclick="selectBet(this, 'win', 'home')">
+                                    Barcelona (1.95x)
+                                </button>
+                                <button class="bet-button" onclick="selectBet(this, 'win', 'draw')">
+                                    Draw (3.1x)
+                                </button>
+                                <button class="bet-button" onclick="selectBet(this, 'win', 'away')">
+                                    Real Madrid (2.05x)
+                                </button>
+                            </div>
+                            <div class="bet-input-group">
+                                <input type="number" class="bet-input" placeholder="Amount" step="0.01" min="0.01">
+                                <button class="place-bet" onclick="placeBet(2, 'win')">Place Bet</button>
+                            </div>
+                        </div>
+
+                        <div class="bet-type">
+                            <h4><i class="fas fa-futbol"></i> Total Goals</h4>
+                            <div class="bet-options">
+                                <button class="bet-button" onclick="selectBet(this, 'total', 'over')">
+                                    Over 3.5 (2.2x)
+                                </button>
+                                <button class="bet-button" onclick="selectBet(this, 'total', 'under')">
+                                    Under 3.5 (1.7x)
+                                </button>
+                            </div>
+                            <div class="bet-input-group">
+                                <input type="number" class="bet-input" placeholder="Amount" step="0.01" min="0.01">
+                                <button class="place-bet" onclick="placeBet(2, 'total')">Place Bet</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mybets" class="tab-content hidden">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">Active Bets</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">2.5 ETH</div>
+                    <div class="stat-label">Total Wagered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">1.8 ETH</div>
+                    <div class="stat-label">Total Won</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">72%</div>
+                    <div class="stat-label">Win Rate</div>
+                </div>
+            </div>
+
+            <div id="myBetsList">
+                <div class="match-card">
+                    <div class="match-header">
+                        <div class="teams">Chelsea vs Arsenal</div>
+                        <div class="match-time">
+                            <span class="status-indicator status-active"></span>
+                            Active • 0.1 ETH wagered
+                        </div>
+                    </div>
+                    <p>Bet: Chelsea to win • Potential payout: 0.21 ETH</p>
+                </div>
+
+                <div class="match-card">
+                    <div class="match-header">
+                        <div class="teams">Bayern vs Dortmund</div>
+                        <div class="match-time">
+                            <span class="status-indicator status-finished"></span>
+                            Won • 0.25 ETH wagered
+                        </div>
+                    </div>
+                    <p>Bet: Over 2.5 goals • Payout: 0.475 ETH</p>
+                    <button class="place-bet" style="margin-top: 10px;">Claim Winnings</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="rewards" class="tab-content hidden">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">Gold</div>
+                    <div class="stat-label">Current Tier</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">1,250</div>
+                    <div class="stat-label">Loyalty Points</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">7</div>
+                    <div class="stat-label">Consecutive Wins</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">Available Rewards</div>
+                </div>
+            </div>
+
+            <div class="rewards-list">
+                <div class="reward-item">
+                    <div class="reward-info">
+                        <div class="reward-amount">0.05 ETH</div>
+                        <div>Welcome Bonus</div>
+                        <small>Expires in 15 days</small>
+                    </div>
+                    <button class="claim-reward">Claim</button>
+                </div>
+
+                <div class="reward-item">
+                    <div class="reward-info">
+                        <div class="reward-amount">0.1 ETH</div>
+                        <div>5 Consecutive Wins Bonus</div>
+                        <small>Expires in 7 days</small>
+                    </div>
+                    <button class="claim-reward">Claim</button>
+                </div>
+
+                <div class="reward-item">
+                    <div class="reward-info">
+                        <div class="reward-amount">0.2 ETH</div>
+                        <div>Gold Tier Upgrade Bonus</div>
+                        <small>Expires in 30 days</small>
+                    </div>
+                    <button class="claim-reward">Claim</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="history" class="tab-content hidden">
+            <div id="historyList">
+                <div class="match-card">
+                    <div class="match-header">
+                        <div class="teams">Liverpool vs Man City</div>
+                        <div class="match-time">
+                            <span class="status-indicator status-finished"></span>
+                            Final: 2-1 • Dec 20, 2024
+                        </div>
+                    </div>
+                    <p>Your bet: Liverpool to win (0.15 ETH) • Result: WON • Payout: 0.285 ETH</p>
+                </div>
+
+                <div class="match-card">
+                    <div class="match-header">
+                        <div class="teams">PSG vs Monaco</div>
+                        <div class="match-time">
+                            <span class="status-indicator status-finished"></span>
+                            Final: 1-3 • Dec 18, 2024
+                        </div>
+                    </div>
+                    <p>Your bet: PSG to win (0.08 ETH) • Result: LOST</p>
+                </div>
+
+                <div class="match-card">
+                    <div class="match-header">
+                        <div class="teams">AC Milan vs Inter</div>
+                        <div class="match-time">
+                            <span class="status-indicator status-cancelled"></span>
+                            Cancelled • Dec 15, 2024
+                        </div>
+                    </div>
+                    <p>Your bet: Over 2.5 goals (0.12 ETH) • Result: REFUNDED</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let provider;
+        let signer;
+        let account;
+        let bettingContract;
+        let rewardsContract;
+
+        // Contract addresses - Update these with deployed contract addresses
+        const BETTING_CONTRACT_ADDRESS = "0xB539bf7D5960087A2742B8Fd2DceA8aE86E6E516"; // Replace with actual deployed address
+        const REWARDS_CONTRACT_ADDRESS = "0xB539bf7D5960087A2742B8Fd2DceA8aE86E6E516"; // Replace with actual deployed address
+
+        // Contract ABIs (simplified for demo - replace with full ABIs from compilation)
+        const BETTING_ABI = [
+            "function createMatch(string memory homeTeam, string memory awayTeam, uint256 startTime, uint256 duration, uint8 targetTotal, uint8 handicapValue) external",
+            "function placeBet(uint32 matchId, uint8 betType, uint8 prediction, uint8 betOptions) external payable",
+            "function finishMatch(uint32 matchId, uint8 homeScore, uint8 awayScore) external",
+            "function claimWinnings(uint32 matchId) external",
+            "function getMatchBasicInfo(uint32 matchId) external view returns (string memory, string memory, uint256, uint256)",
+            "function getMatchStatus(uint32 matchId) external view returns (uint8, uint256, uint256)",
+            "function getBetBasicInfo(uint32 matchId, address bettor) external view returns (uint256, uint8, bool, bool)",
+            "event MatchCreated(uint32 indexed matchId, string homeTeam, string awayTeam, uint256 startTime)",
+            "event BetPlaced(uint32 indexed matchId, address indexed bettor, uint8 betType, uint256 amount)"
+        ];
+
+        const REWARDS_ABI = [
+            "function recordBet(address user, uint256 betAmount, bool won) external",
+            "function recordWinning(address user, uint256 winAmount) external",
+            "function claimReward(uint256 rewardId) external",
+            "function getUserBasicStats(address user) external view returns (uint256, uint256, uint256, uint256)",
+            "function getUserAdvancedStats(address user) external view returns (uint256, uint8, bool, uint256)",
+            "function getActiveRewards(address user) external view returns (uint256[] memory, uint256[] memory, string[] memory, uint256[] memory)",
+            "event RewardEarned(address indexed user, uint256 rewardId, uint256 amount)",
+            "event RewardClaimed(address indexed user, uint256 rewardId, uint256 amount)"
+        ];
+
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = provider.getSigner();
+                    account = await signer.getAddress();
+
+                    document.getElementById('walletAddress').textContent =
+                        account.slice(0, 6) + '...' + account.slice(-4);
+
+                    // Initialize contracts
+                    bettingContract = new ethers.Contract(BETTING_CONTRACT_ADDRESS, BETTING_ABI, signer);
+                    rewardsContract = new ethers.Contract(REWARDS_CONTRACT_ADDRESS, REWARDS_ABI, signer);
+
+                    // Update contract addresses in UI
+                    document.getElementById('bettingContractAddress').textContent = BETTING_CONTRACT_ADDRESS;
+                    document.getElementById('rewardsContractAddress').textContent = REWARDS_CONTRACT_ADDRESS;
+
+                    updateBalance();
+                    loadUserData();
+
+                } catch (error) {
+                    console.error('Error connecting wallet:', error);
+                    alert('Error connecting wallet: ' + error.message);
+                }
+            } else {
+                alert('Please install MetaMask!');
+            }
+        }
+
+        async function updateBalance() {
+            if (provider && account) {
+                try {
+                    const balance = await provider.getBalance(account);
+                    const ethBalance = ethers.utils.formatEther(balance);
+                    document.getElementById('balance').textContent =
+                        `Balance: ${parseFloat(ethBalance).toFixed(4)} ETH`;
+                } catch (error) {
+                    console.error('Error updating balance:', error);
+                }
+            }
+        }
+
+        async function loadUserData() {
+            if (!rewardsContract || !account) return;
+
+            try {
+                // Load user stats from rewards contract
+                const basicStats = await rewardsContract.getUserBasicStats(account);
+                const advancedStats = await rewardsContract.getUserAdvancedStats(account);
+
+                console.log('User stats loaded:', { basicStats, advancedStats });
+
+                // Update UI with real data when available
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+
+        function showTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.add('hidden'));
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.remove('hidden');
+            event.target.classList.add('active');
+        }
+
+        function selectBet(button, betType, selection) {
+            // Remove selection from siblings
+            const siblings = button.parentElement.querySelectorAll('.bet-button');
+            siblings.forEach(sibling => sibling.classList.remove('selected'));
+
+            // Add selection to clicked button
+            button.classList.add('selected');
+
+            // Store selection data
+            button.parentElement.dataset.selectedBet = selection;
+        }
+
+        async function placeBet(matchId, betType) {
+            if (!account) {
+                alert('Please connect your wallet first!');
+                return;
+            }
+
+            if (!bettingContract) {
+                alert('Contract not initialized!');
+                return;
+            }
+
+            try {
+                const betTypeElement = event.target.closest('.bet-type');
+                const amountInput = betTypeElement.querySelector('.bet-input');
+                const amount = amountInput.value;
+
+                if (!amount || amount <= 0) {
+                    alert('Please enter a valid bet amount!');
+                    return;
+                }
+
+                const selectedBet = betTypeElement.querySelector('.bet-button.selected');
+                if (!selectedBet) {
+                    alert('Please select a betting option!');
+                    return;
+                }
+
+                const weiAmount = ethers.utils.parseEther(amount);
+
+                console.log(`Placing bet: ${amount} ETH on match ${matchId}, type: ${betType}`);
+
+                // Map bet types to contract enum values
+                let betTypeNum = 0; // WinLose
+                let prediction = 0;
+                let betOptions = 0;
+
+                if (betType === 'win') {
+                    betTypeNum = 0; // WinLose
+                    const selection = betTypeElement.dataset.selectedBet;
+                    if (selection === 'home') {
+                        prediction = 0;
+                        betOptions = 2; // bit 1-2: home (01)
+                    } else if (selection === 'away') {
+                        prediction = 1;
+                        betOptions = 4; // bit 1-2: away (10)
+                    } else {
+                        prediction = 2;
+                        betOptions = 6; // bit 1-2: draw (11)
+                    }
+                } else if (betType === 'total') {
+                    betTypeNum = 1; // OverUnder
+                    const selection = betTypeElement.dataset.selectedBet;
+                    if (selection === 'over') {
+                        prediction = 3;
+                        betOptions = 1; // bit 0: isOver = true
+                    } else {
+                        prediction = 2;
+                        betOptions = 0; // bit 0: isOver = false
+                    }
+                }
+
+                // Call contract method
+                const tx = await bettingContract.placeBet(matchId, betTypeNum, prediction, betOptions, {
+                    value: weiAmount,
+                    gasLimit: 500000
+                });
+
+                alert(`Transaction submitted! Hash: ${tx.hash}`);
+
+                // Wait for confirmation
+                await tx.wait();
+                alert(`Bet placed successfully! Amount: ${amount} ETH`);
+
+                // Clear form
+                amountInput.value = '';
+                selectedBet.classList.remove('selected');
+
+                // Refresh user data
+                updateBalance();
+                loadUserData();
+
+            } catch (error) {
+                console.error('Error placing bet:', error);
+                alert('Error placing bet: ' + (error.reason || error.message));
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            // Check if wallet is already connected
+            if (typeof window.ethereum !== 'undefined' && window.ethereum.selectedAddress) {
+                connectWallet();
+            }
+
+            // Update balance periodically
+            setInterval(updateBalance, 30000);
+        });
+
+        // Handle account changes
+        if (typeof window.ethereum !== 'undefined') {
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length > 0) {
+                    account = accounts[0];
+                    document.getElementById('walletAddress').textContent =
+                        account.slice(0, 6) + '...' + account.slice(-4);
+                    updateBalance();
+                    loadUserData();
+                } else {
+                    account = null;
+                    document.getElementById('walletAddress').textContent = 'Not Connected';
+                    document.getElementById('balance').textContent = 'Balance: 0 ETH';
+                }
+            });
+
+            window.ethereum.on('chainChanged', () => {
+                window.location.reload();
+            });
+        }
+    </script>
+</body>
+</html>

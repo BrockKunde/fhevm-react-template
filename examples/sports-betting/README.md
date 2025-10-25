@@ -1,135 +1,177 @@
 # Confidential Sports Betting Platform
 
-A fully confidential sports betting platform built with FHEVM that ensures private predictions and fair outcomes.
+A privacy-first sports betting platform built with Fully Homomorphic Encryption (FHE) technology, enabling completely confidential wagering on the blockchain.
 
-## Features
+## 🔐 Core Concept
 
-- **Encrypted Predictions**: All bet predictions are encrypted using FHEVM, ensuring no one can see your choices until match completion
-- **Pool-Based Payouts**: Winners share the losing pool proportionally based on their bet amounts
-- **Multiple Bet Types**: Support for Win/Lose, Over/Under, and Handicap betting
-- **Oracle-Based Settlement**: Trusted oracles finalize match results to determine winners
-- **Fair & Transparent**: All logic executed on-chain with encrypted state
+This platform leverages **Fully Homomorphic Encryption (FHE)** to create a trustless, privacy-preserving sports betting experience. Unlike traditional betting platforms, all bet amounts, predictions, and user data remain encrypted on-chain, ensuring complete confidentiality while maintaining the transparency and security of blockchain technology.
 
-## Architecture
+### Key Features
 
-### Smart Contract
+- **Private Betting**: All wagers and predictions are encrypted using FHE, protecting user privacy
+- **Confidential Odds**: Betting odds and pool sizes remain encrypted until match settlement
+- **Secure Rewards**: Automated reward distribution through encrypted smart contracts
+- **Zero-Knowledge Verification**: Verify wins without revealing bet details
+- **On-Chain Privacy**: Complete transaction privacy while maintaining blockchain immutability
 
-The `ConfidentialSportsBetting.sol` contract implements:
+## 🎯 How It Works
 
-- **Encrypted Bets**: Uses `euint8` for storing encrypted predictions
-- **Access Control**: Owner and oracle authorization patterns
-- **Match Lifecycle**: Created → Active → Finished/Cancelled states
-- **Automatic Refunds**: Cancelled matches automatically refund all bettors
+1. **Match Creation**: Operators create encrypted betting markets for upcoming sports events
+2. **Place Bets**: Users submit encrypted bets on match outcomes (win/lose, over/under, handicap)
+3. **Encrypted Processing**: All calculations happen on encrypted data without decryption
+4. **Match Settlement**: Oracle submits results, contracts calculate payouts on encrypted values
+5. **Claim Winnings**: Winners receive payouts automatically with full privacy protection
 
-### Frontend Integration
+## 🏆 Supported Bet Types
 
-Built with Next.js and `@fhevm/sdk`, the frontend provides:
+- **Win/Lose/Draw**: Predict the match outcome
+- **Over/Under**: Total goals/points threshold betting
+- **Handicap Betting**: Encrypted handicap wagering
+- **Loyalty Rewards**: Privacy-preserving reward system for active bettors
 
-- Wallet connection via MetaMask
-- FHEVM initialization and status tracking
-- Encrypted bet placement using SDK hooks
-- Match browsing and selection
-- Winnings claiming interface
+## 📡 Smart Contract
 
-## Quick Start
+**Contract Address**: `0xB539bf7D5960087A2742B8Fd2DceA8aE86E6E516`
 
-### Prerequisites
+**Network**: Zama Sepolia Testnet
 
-- Node.js 18.x or 20.x
-- MetaMask wallet
-- Sepolia testnet ETH
+The smart contract implements FHE operations using the fhEVM framework, enabling:
+- Encrypted bet storage and processing
+- Private odds calculations
+- Confidential pool management
+- Secure payout distribution
 
-### Installation
+## 🎬 Demo
 
-```bash
-npm install
+**Live Demo**: [https://confidential-sports-betting.vercel.app/](https://confidential-sports-betting.vercel.app/)
+
+### Video Demonstration
+
+[Watch Demo Video](ConfidentialSportsBetting.mp4) - See the platform in action with live betting scenarios
+
+### On-Chain Transaction Screenshots
+
+All transactions are verifiable on the Zama Sepolia Testnet block explorer while maintaining user privacy through FHE encryption.
+
+#### Example Transactions:
+- Encrypted bet placement
+- Match creation with encrypted parameters
+- Confidential reward distribution
+- Privacy-preserving payout claims
+
+*View transactions on [Zama Sepolia Explorer](https://sepolia.etherscan.io/address/0xB539bf7D5960087A2742B8Fd2DceA8aE86E6E516)*
+
+## 🛡️ Privacy Architecture
+
+### FHE Implementation
+
+The platform uses **fhEVM** (Fully Homomorphic Encryption for EVM) to enable:
+
+```
+User Bet (Plaintext) → Encryption → FHE Contract (Encrypted) → Processing → Results (Encrypted) → Decryption (Winner Only) → Payout
 ```
 
-### Development
+### Privacy Guarantees
 
-```bash
-npm run dev
-```
+- **Bet Amounts**: Encrypted on-chain, only known to the bettor
+- **Predictions**: Completely confidential until match settlement
+- **Pool Sizes**: Aggregated in encrypted form
+- **User Balances**: Private account tracking
+- **Win/Loss Records**: Encrypted historical data
 
-Visit [http://localhost:3001](http://localhost:3001)
+## 💎 Technology Stack
 
-## Usage Example
+- **Smart Contracts**: Solidity with fhEVM extensions
+- **Encryption**: TFHE (Torus Fully Homomorphic Encryption)
+- **Frontend**: HTML5, JavaScript, Ethers.js
+- **Blockchain**: Zama Sepolia Testnet
+- **Oracle**: Decentralized sports data feeds
 
-```typescript
-import { useFhevmClient, useEncryptInput, useFhevmContract } from '@fhevm/sdk/react';
+## 🌐 Live Application
 
-// Initialize FHEVM
-const { client, isInitialized } = useFhevmClient({ provider, signer });
+**Website**: [https://confidential-sports-betting.vercel.app/](https://confidential-sports-betting.vercel.app/)
 
-// Encrypt bet prediction
-const { encrypt } = useEncryptInput();
-const encrypted = await encrypt({
-  values: [{ value: 0, type: 'euint8' }], // 0 = Home, 1 = Away
-  contractAddress: CONTRACT_ADDRESS,
-  userAddress: userAddress,
-});
+**Repository**: [https://github.com/BrockKunde/ConfidentialSportsBetting](https://github.com/BrockKunde/ConfidentialSportsBetting)
 
-// Place bet
-const tx = await contract.placeBet(matchId, betType, prediction, betOptions, {
-  value: ethers.parseEther('0.1')
-});
-```
+## 🔧 Features Overview
 
-## Contract Functions
+### For Bettors
+- Connect wallet and place encrypted bets
+- View active matches and betting options
+- Track personal betting history (encrypted)
+- Claim winnings with privacy protection
+- Earn loyalty rewards
 
-### User Functions
+### For Operators
+- Create encrypted betting markets
+- Set confidential odds and limits
+- Submit match results via oracle
+- Manage platform parameters
 
-- `placeBet(matchId, betType, prediction, betOptions)` - Place an encrypted bet
-- `claimWinnings(matchId)` - Claim winnings for a finished match
-- `getMatchBasicInfo(matchId)` - View match details
-- `getMatchStatus(matchId)` - Check match status and betting pools
-- `getBetBasicInfo(matchId, bettor)` - View bet information
+### Privacy Dashboard
+- Encrypted bet tracking
+- Confidential statistics
+- Private reward tiers
+- Anonymous leaderboards
 
-### Oracle Functions
+## 🎮 User Interface
 
-- `createMatch(...)` - Create a new betting match
-- `finishMatch(matchId, homeScore, awayScore)` - Finalize match results
-- `cancelMatch(matchId)` - Cancel match and refund all bets
+The platform features an intuitive interface with:
+- Real-time match listings
+- Multiple bet type options
+- Encrypted balance display
+- Privacy-preserving transaction history
+- Responsive design for all devices
 
-### Owner Functions
+## 🔒 Security Features
 
-- `authorizeOracle(oracle)` - Authorize an oracle address
-- `revokeOracle(oracle)` - Revoke oracle authorization
-- `withdraw()` - Withdraw contract balance
+- **Non-custodial**: Users maintain full control of funds
+- **Encrypted State**: All sensitive data stored in encrypted form
+- **Verifiable Results**: Match outcomes verified on-chain
+- **Automated Payouts**: Smart contract-based distribution
+- **Access Control**: Role-based permissions for operators
 
-## Bet Types
+## 📊 Statistics & Analytics
 
-1. **Win/Lose**: Predict which team will win
-2. **Over/Under**: Predict if total score will be over or under a target
-3. **Handicap**: Predict outcome with a handicap applied
+Users can view their betting performance through encrypted analytics:
+- Total bets placed (encrypted count)
+- Win rate (privacy-preserving calculation)
+- Reward tier status
+- Historical performance trends
 
-## Security Features
+All statistics are calculated on encrypted data, ensuring complete privacy.
 
-- Encrypted predictions prevent bet manipulation
-- Reentrancy protection on critical functions
-- Access control for oracle and owner operations
-- Automatic state management and validation
+## 🌟 Use Cases
 
-## Testing
+1. **Private Sports Wagering**: Bet on your favorite teams without revealing strategies
+2. **Confidential Pool Betting**: Join pools without exposing bet sizes
+3. **Anonymous High-Roller Betting**: Large wagers with complete privacy
+4. **Privacy-First Fantasy Sports**: Encrypted fantasy league betting
+5. **Institutional Betting**: Corporate betting with confidentiality
 
-```bash
-# Run tests
-npm test
+## 🔮 Future Enhancements
 
-# Run with coverage
-npm run coverage
-```
+- Multi-sport expansion
+- Live in-game betting with FHE
+- Peer-to-peer encrypted betting markets
+- Advanced bet types (parlays, teasers)
+- Mobile application
+- Cross-chain privacy bridges
 
-## Deployment
+## 📜 License
 
-The contract is deployed on Sepolia testnet. See the main repository README for deployment details.
+MIT License - Open source and privacy-focused
 
-## Learn More
+## 🤝 Contributing
 
-- [FHEVM SDK Documentation](../../packages/fhevm-sdk/README.md)
-- [API Reference](../../docs/api-reference.md)
-- [Deployment Guide](../../docs/deployment-guide.md)
+This is an open-source privacy project. Contributions are welcome to enhance the platform's privacy features and user experience.
 
-## License
+## ⚠️ Disclaimer
 
-MIT
+This platform is for demonstration purposes on testnet. Always bet responsibly and comply with local gambling regulations.
+
+---
+
+**Built with Privacy. Powered by FHE. Secured by Blockchain.**
+
+*Experience the future of confidential sports betting at [https://confidential-sports-betting.vercel.app/](https://confidential-sports-betting.vercel.app/)*
